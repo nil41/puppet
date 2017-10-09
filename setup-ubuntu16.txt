@@ -1,0 +1,44 @@
+on master:-
+//change hostname 
+//entry in /etc/hosts
+//install package
+
+#puppet cert list -all
+
+#puppet cert sign puppetagent.org.com        //to sign agent cert  (use HOSTNAME)
+
+
+cd to manifest
+
+vi site.pp
+
+ node "" {
+   package {'git':
+    name => 'git',
+	ensure => installed,
+      }
+  } 
+  
+#puppet parser validate site.pp     //check 
+  
+---------------------------
+on agent:-
+//change hostname
+//entry in /etc/hosts
+//install package
+
+//entry of server into puppet.config file
+
+#puppet agent --no-daemonize --onetime --verbose         //to send request
+
+#puppet agent --enable            //some issue
+
+#puppet agent --server puppetagent.org.com        
+
+#git --version    //if already installed then remove it #apt-get remove git
+
+#puppet agent -t       //pull manually
+
+#git --version
+===========================================
+puppet cert sign puppetagent.org.com

@@ -1,0 +1,263 @@
+Puppet:-   4.x
+-Automation tool
+-Puppet Labs
+-Linux, Windows, Mac
+-Ruby
+-------------------
+-client server architecture
+ puppet master (server) and puppet agent (client)
+-one or more puppet master over network
+ 
+-it requires NTP for synchronization.
+--------------------
+-8140 port
+
+-default 30m  (change it by "runinterval =5m" >> puppet.conf)
+--------------
+-Puppet Enterprise officially supports Windows Server 2008 R2 and Windows 7, 
+but for the agent role only. 
+The puppet master role must reside on a Linux-based system such as Debian or RedHat.
+
+1. hosts file entry of puppetmaster, try ping
+2. entry in C:\ProgramData\PuppetLabs\puppet\etc\puppet.conf
+   for puppetmaster address
+
+--------------
+PKG:-
+apt-get install puppet       # On clients (nodes)
+apt-get install puppetmaster # On server (master)
+
+yum install puppet        # On clients (nodes)
+yum install puppet-server # On server (master)
+-----------------
+SRV:-
+-puppetmaster   ->master
+-puppet  ->agent
+------------------
+configuration file:- on all hosts
+    /etc/puppet/puppet.conf 
+-dns name
+-cert
+-server address       //need to mention at agent side
+-------------------------
+mainifest file:-   //master
+   /etc/puppet/mainifest/site.pp
+ 
+//where we write code (resources)
+-----------------------------
+to push config from master:- 
+ #puppet apply filename.pp      OR        #service puppetmaster restart
+-----------------------------
+to trigger config from agent:-
+ #puppet agent --test           OR         #puppet agent -t
+----------------------------
+-default time to read mainifest file from agent is 30m
+----------------------------
+Syntax:-
+
+
+node 'hostname1','hostname2' {
+  resources_type { 'title':
+    argument  => value,
+    other_arg => value,
+ }
+}
+
+node default{
+        }
+----------------------------
+		
+resources type:- package, service, file, user, mount, exec ...		
+--------------------------------
+ e.g.1:-
+
+#vim site.pp
+
+node 'agent_hostname' {
+         file{ '/etc/test':              //first check file is present if not creates file
+		  content => "this is test file",	   
+		     }
+         } 
+------------------------------------------
+e.g.2:-
+
+user { 'testuser':
+  ensure     => present,
+  uid        => '1000',
+  gid        => '1000',
+  shell      => '/bin/bash',
+  home       => '/home/testuser'
+}
+
+------------------------------
+e.g.3:-
+
+Installation of OpenSSH package
+
+package { 'openssh':
+  ensure => present,           //absent  for uninstall
+}
+----------------------------
+e.g.4:-
+Start of httpd service
+
+service { 'httpd':
+  ensure => running,
+  enable => true,
+}
+
+-------------------------------
+
+file { 'resource title':
+  path                    => # The path to the file to manage.
+  ensure                  => # Whether the file should exis.present/absent/file/directory/link
+  content                 => # The desired contents of a file, as a string...
+  mode                    => # The desired permissions mode for the file, in...
+  owner                   => # The user to whom the file should belong....
+  source                  => # A source file, which will be copied into place...
+  source_permissions      => # Whether Puppet should copy owner permission.use/ignore
+  target                  => # if ensure=>link then target=>path to original link.
+}
+
+---------------------
+package { 'resource title':
+  provider             => # apt-get/dpkg/rpm/yum/undef
+  ensure               => # present/installed/absent/purge/latest
+}
+
+----------------------------
+Executing  commands:-
+
+exec { 'get_my_file':
+       command   => "wget http://mysite/myfile.tar.gz -O /tmp/myfile.tar.gz',
+       path      => '/sbin:/bin:/usr/sbin:/usr/bin',
+
+	   # A file created by the command. It if exists, the command is not executed
+       creates   => '/tmp/myfile.tar.gz',
+	   
+    # A command or an array of commands, if any of them returns an error
+    # the command is not executed
+    onlyif    => 'ls /tmp/myfile.tar.gz && false',
+	
+    # A command or an array of commands, if any of them returns an error
+    # the command IS executed
+    unless    => 'ls /tmp/myfile.tar.gz',
+}
+
+-----------------------------
+
+
+
+
+
+------------------------------
+-to install apache/http on diff linux distro:-
+
+if $::osfamily == 'Debian' {
+   $package_name = 'apache2'
+ } 
+elsif $::osfamily == 'RedHat' {
+   $package_name = 'httpd'
+ } else
+ {
+   notify { "Operating system $::operatingsystem not supported" }
+ }
+ 
+ 
+ package {'os':
+    name => $package_name,
+	ensure => present,
+	 }
+ 
+ 
+-----------------------------------
+-dependancies:-
+
+
+   exec { 'apt-update':                  //title
+          command => '/usr/bin/apt-get update' 
+        }
+
+                                      //install apache2 package
+  package { 'apache2':                  //title
+           require => Exec['apt-update'], // require (meta parameter)'apt-update' before installing
+           ensure => installed,
+        }
+
+		                              // ensure apache2 service is running
+  service { 'apache2':
+            ensure => running,
+         }
+
+                                      // ensure info.php file exists
+  file { '/var/www/html/info.php':
+  ensure => file,
+  content => '<?php  phpinfo(); ?>',    
+  require => Package['apache2'],    // require 'apache2' package before creating
+  } 
+------------------------------------------------------------------------------------------
+
+
+=================================
+resources:- package, service, file, user, mount, exec ...
+
+classes:- collection of resources
+
+mainifest:- collection of classes and resources
+
+modules:- collection of mainifests
+==================================
+Classes are containers of different resources. 
+
+class mysql (
+  root_password => 'default_value',
+  port          => '3306',
+) {
+  package { 'mysql-server':
+    ensure => present,
+  }
+  service { 'mysql':
+    ensure    => running,
+  }
+}
+
+--------------------
+When we have to use a class previously defined, we declare it.
+
+This can be done in 2 different ways:
+
+without parameters:
+
+include mysql
+
+class declaration with explicit parameters:
+
+class { 'mysql':
+  root_password => 'my_value',
+  port          => '3307',
+}
+==========================================
+modules:- 
+
+-need to install predefined modules
+e.g.:-  apache module
+
+#puppet module install puppetlabs-apache   //to download apache module  default download into "modules" folder
+
+- resource-like class declarations which override the default values of class attributes.
+
+node 'puppetagenthost' {
+  class { 'apache': }             # declare class       OR we can use "include apache" also
+  
+  apache::vhost { 'test.com':            # override vhost resource
+    port    => '80',
+    docroot => '/var/www/html'
+  }
+}
+
+
+============================================
+
+Ref:-
+http://www.bogotobogo.com/DevOps/Puppet/puppet_basic_tasks_with_ec2_master_agent_nodes.php
+

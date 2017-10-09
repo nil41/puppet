@@ -1,0 +1,19 @@
+Puppet is a good choice if stability and maturity are key factors for you. 
+
+Price: Puppet comes in a free open source version or a paid commercial enterprise version 
+       that runs $112 per node per year, with volume discounts.
+===========================
+Pros:
+
+Well-established support community through Puppet Labs.
+It has the most mature interface and runs on nearly every OS.
+Simple installation and initial setup.
+Most complete Web UI in this space. (puppet enterprise consol )
+Strong reporting capabilities.
+
+
+For more advanced tasks, you will need to use the CLI, which is Ruby-based (meaning you’ll have to understand Ruby).
+Support for pure-Ruby versions (rather than those using Puppet’s customized DSL) is being scaled back.
+============================
+https://puppet.com/product/faq
+============================

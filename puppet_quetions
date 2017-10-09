@@ -1,0 +1,48 @@
+puppet intw ques:-
+
+1. what is puppet? current version? port?
+2. diff between puppet, chef, ansible
+3. what is menifests, location ?, config file location and what it contains according to master and agent?
+4. what is module? how it differnet from menifest?
+5. why and how certificate process works?
+-cmds to request/listout certificate and sign certifacate
+-what is + meaning while list of certificate
+-can we do autosign for all clients?
+-where certificates are stored?
+-what is facter
+-can we set env variables as factor? how?
+-why we use FACTOR_ ?
+-what is puppet catalog? where it compiles?
+-how we upgrade puppet and factors?
+-can we use public repo to install packages or we can only use os -repos to install packeges like php?
+-does puppet runs on windows? ask for master and agent seprately
+-bydefault which mechanism it uses? pull/push?
+
+-example of resources?
+-how to achive dependencies?
+
+-if puppet master version is older than agent , then it works?
+-if ntp is not installed then it works?
+-is there any need to add hostnames of master and agents into /etc/hosts file?
+-default time to pull configuration?
+-can we change this default time of pull?
+
+-what is etckeeper-commit-post and etckeeper-commit-pre?
+-what is puppet kick?
+-what is Mcollective (orchetration)?
+-can we use more than one masters in nw?
+-can agent talk/work with more than one master?
+-how agent knows master? is there any entry need to write.
+
+-what is puppet lab? puppet.com?
+-can we download module from puppet.com and use this in our site.pp
+
+write code:-
+1. simple example or syntax?
+
+2. if we want to install apache, and some agents are debian and remaining are rpm, then how it differentiate the OS in puppet code?
+
+-cost of puppet?
+
+-can we use puppet with jenkins and git?
+
